@@ -6,7 +6,7 @@
 #include <libxml++/parsers/textreader.h>
 #include <iostream>
 #include<mysql.h>
-
+#include<typeinfo>
 
 
 using namespace std;
@@ -118,6 +118,81 @@ void inserting(string name,string email_id,string date,string mob,string pwd)
 
 
 }
+void update(string id)
+{
+int option;
+const char* q;
+while(option!=6)
+{
+string query;
+string name,email_id,dob,mob,pass;
+cout<<"what do u want to update?  1.name ,2.email_id,3.dob ,4.mobile no.,5.password and 6.NO Updation"<<endl;
+cin>>option;
+switch(option)
+{
+case 1:
+cout<<"enter the new name"<<endl;cin>>name;
+query="update "+tablename+" set username='"+name+"' where userid='"+id+"'";
+q=query.c_str();
+qstate=mysql_query(conn,q);
+if(!qstate)
+cout<<"Updation done successfully"<<endl;
+else
+cout<<"query execution problem"<<mysql_error(conn)<<endl;
+break;
+
+case 2:
+cout<<"enter the new emaild_id"<<endl;cin>>email_id;
+query="update "+tablename+" set emailid='"+email_id+"' where userid='"+id+"'";
+q=query.c_str();
+qstate=mysql_query(conn,q);
+if(!qstate)
+cout<<"Updation done successfully"<<endl;
+else
+cout<<"query execution problem"<<mysql_error(conn)<<endl;
+break;
+
+case 3:
+cout<<"enter the new date of birth(YYYY-MM-DD)"<<endl;cin>>dob;
+query="update "+tablename+" set dob='"+dob+"' where userid='"+id+"'";
+q=query.c_str();
+qstate=mysql_query(conn,q);
+if(!qstate)
+cout<<"Updation done successfully"<<endl;
+else
+cout<<"query execution problem"<<mysql_error(conn)<<endl;
+break;
+
+case 4:
+cout<<"enter the new mobile number"<<endl;cin>>mob;
+query="update "+tablename+" set mob='"+mob+"' where userid='"+id+"'";
+q=query.c_str();
+qstate=mysql_query(conn,q);
+if(!qstate)
+cout<<"Updation done successfully"<<endl;
+else
+cout<<"query execution problem"<<mysql_error(conn)<<endl;
+break;
+
+case 5:
+cout<<"enter the new password"<<endl;cin>>pass;
+query="update "+tablename+" set pass='"+pass+"' where userid='"+id+"'";
+q=query.c_str();
+qstate=mysql_query(conn,q);
+if(!qstate)
+cout<<"Updation done successfully"<<endl;
+else
+cout<<"query execution problem"<<mysql_error(conn)<<endl;
+break;
+
+default:
+cout<<"invalid option"<<endl;
+
+}
+
+}
+}
+
 void deleting()
 {
 
@@ -146,27 +221,46 @@ void insertfromxml()
 {
 string name,email_id,dob,mob,pass;
     xmlpp::TextReader reader("example.xml");
-int d=0;int count=0;
-string n;
+int d=0;int count=0;int count1=0;
+string n=" ";
     while(reader.read())
     { 
- 	cout<<d<<" "<<n<<" "<<reader.get_depth()<<" "<<reader.get_name()<<" "<<reader.get_value()<<endl;
 
-	if(d>reader.get_depth())
-{ d--;
-	continue;}
+if(reader.get_name()=="data")
+{
+++count1;
 
-        if(reader.get_name()=="userid")
+}
+if(count1==2)
+break;
+
+
+
+ 	cout<<d<<" "<<n<<" "<<reader.get_depth()<<" "<<reader.get_name()<<" "<<reader.get_value()<<" "<<count<<endl;
+
+       if(reader.get_name()=="user")
         { d=reader.get_depth();
 	++count;
+         if(count==2)
+{count=0;
+cout<<name<<email_id<<dob<<mob<<pass<<endl;
+inserting(name,email_id,dob,mob,pass);
+         }
          continue;
-        }
-        if(d<=reader.get_depth() && reader.get_name()=="#text")
+        } 
+
+ if(d>reader.get_depth())
+{ d--;
+        continue;}
+
+
+        if(d<reader.get_depth() && reader.get_name()=="#text")
 { 
-if(reader.has_value())
+if(n!=" ")
 { 
+
 cout<<"got in"<<endl;
-if(n=="name"){name=reader.get_value();
+if(n=="name"){name=reader.get_value();n=" ";
 continue; }
 else if(n=="emailid"){email_id=reader.get_value(); }
 else if(n=="dob"){dob=reader.get_value(); }
@@ -185,11 +279,9 @@ if(d<=reader.get_depth() && (reader.get_name()=="name" || reader.get_name()=="em
 { n=reader.get_name();  
 d=reader.get_depth();
 continue; }
-if(count==2)
-{
- count=0;
-inserting(name,email_id,dob,mob,pass);
-}
+ 
+
+
 }
 }
 
@@ -212,12 +304,12 @@ string userid,pwd,email_id,name,mob,date;
    db.create();
 
             int option;
-            while(option!=5)
+            while(option!=6)
             {
 
 
 
-            cout<<"What do you want to do : 1.Display,2.Insert,3.Delete or 4.Insert From XML and 5.Exit"<<endl;
+            cout<<"What do you want to do : 1.Display,2.Insert,3.Delete, 4.update or 5.Insert_from_XML  and 6.Exit"<<endl;
             cin>>option;
 
 
@@ -236,12 +328,18 @@ string userid,pwd,email_id,name,mob,date;
             db.inserting(name,email_id,date,mob,pwd);
             break;
 
-            case 3:
+            	case 3:
                 cout<<"delete a data"<<endl;
                 db.deleting();
                 break;
                 
-            case 4:
+		case 4:
+		cout<<"Give the User_id"<<endl;
+		cin>>userid;
+		db.update(userid);
+		break;
+
+            	case 5:
                 cout<<"insert from Xml"<<endl;
                 db.insertfromxml();
                 break;
