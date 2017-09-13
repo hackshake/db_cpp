@@ -7,7 +7,8 @@
 #include <iostream>
 #include<mysql.h>
 #include<typeinfo>
-
+#include<sstream>
+#include<locale>
 
 using namespace std;
 class DB
@@ -20,7 +21,7 @@ class DB
     string tablename;
 
     public:
- MYSQL* conn;
+	 MYSQL* conn;
 
 
 
@@ -28,10 +29,10 @@ class DB
         {
              this->conn=mysql_init(0);
 
-    if(conn)
-        cout<<"connection object ok!"<<endl;
-    else
-        cout << "connection object problem" <<mysql_error(conn)<< endl;
+    	if(conn)
+        	cout<<"connection object ok!"<<endl;
+    	else
+        	cout << "connection object problem" <<mysql_error(conn)<< endl;
 
          this->conn=mysql_real_connect(conn,"localhost","root","m!lkshake94","db1",0,NULL,0);
 
@@ -120,18 +121,18 @@ void inserting(string name,string email_id,string date,string mob,string pwd)
 }
 void update(string id)
 {
-int option;
-const char* q;
-while(option!=6)
-{
-string query;
-string name,email_id,dob,mob,pass;
-cout<<"what do u want to update?  1.name ,2.email_id,3.dob ,4.mobile no.,5.password and 6.NO Updation"<<endl;
-cin>>option;
-switch(option)
-{
-case 1:
-cout<<"enter the new name"<<endl;cin>>name;
+	int option;
+	const char* q;
+	while(option!=6)
+	{
+		string query;
+		string name,email_id,dob,mob,pass;
+		cout<<"what do u want to update?  1.name ,2.email_id,3.dob ,4.mobile no.,5.password and 6.NO Updation"<<endl;
+		cin>>option;
+		switch(option)
+		{
+		case 1:
+		cout<<"enter the new name"<<endl;cin>>name;
 query="update "+tablename+" set username='"+name+"' where userid='"+id+"'";
 q=query.c_str();
 qstate=mysql_query(conn,q);
@@ -289,6 +290,116 @@ continue; }
 
 };
 
+ bool is_digits(string mob)
+{
+    return mob.find_first_not_of("0123456789")==string::npos;
+
+}
+bool validate_mob(string mob)
+{
+
+ if(is_digits(mob) && mob.size()==10 && mob[0]!='0' )
+ {
+     return true;
+
+ }
+ else
+    return false;
+
+
+}
+
+bool validate_name(string name)
+{
+
+    locale loc;
+
+    for(string::iterator it=name.begin();it!=name.end();++it)
+    {
+
+
+        if(!isalpha(*it,loc))
+            {
+                cout<<"error";
+                return false;
+            }
+    }
+    return true;
+
+}
+bool validate_date(string date)
+{
+    if(date.size()!=10)
+        return false;
+
+    if(date[4]!='-' && date[7]!='-')
+        return false;
+
+
+    string year=date.substr(0,4);
+    string month=date.substr(5,2);
+    string day=date.substr(8,2);
+
+    string m = month;
+    string d=day;
+
+    stringstream geek(m);
+
+    int x = 0;
+    geek >> x;
+
+    if(x<=0 || x>12)
+        return false;
+
+
+    stringstream geek1(d);
+    x=0;
+    geek1>>x;
+
+    if(x<=0 || x>31)
+        return false;
+}
+
+
+bool validate_emailid(string email)
+{
+    int size=email.size();
+    string com=email.substr(size-4,4);
+    if(com!=".com")
+     return false;
+
+
+
+    size_t found=email.find('@');
+
+    //string com=email_id.substr()
+    if (found==std::string::npos)
+        return false;
+
+    return true;
+
+
+
+}
+bool validate_pass(string name)
+{
+
+    locale loc;
+
+    for(string::iterator it=name.begin();it!=name.end();++it)
+    {
+
+
+    if(!isalnum(*it,loc))
+    {
+        cout<<"error";
+        return false;
+    }
+    }
+    return true;
+
+}
+
 int main()
 {
     DB db;
@@ -322,9 +433,36 @@ string userid,pwd,email_id,name,mob,date;
 
             case 2:
              cout<<"insert data"<<endl;
-            
+            start:
             cout<<"Enter the Username , Email_id , date of birth , Mobile Number , Password in the mentioned sequence"<<endl;
-            cin>>name>>email_id>>date>>mob>>pwd;
+           cin>>name>>email_id>>date>>mob>>pwd;   
+            if(!validate_name(name))
+            {
+                cout<<"enter a correct user name"<<endl;
+                goto start;
+            }
+            if(!validate_emailid(email_id))
+            {
+                cout<<"enter a correct email_id"<<endl;
+                goto start;
+            }
+            if(!validate_date(date))
+            {
+                cout<<"enter a correct date in the given format(YYYY-MM-DD)"<<endl;
+                goto start;
+            }
+            if(!validate_pass(pwd))
+            {
+                cout<<"enter a valid password"<<endl;
+                goto start;
+            }
+            if(!validate_mob(mob))
+            {
+                cout<<"enter a correct 10 digit mobile number"<<endl;
+                goto start;
+            }
+ 
+           
             db.inserting(name,email_id,date,mob,pwd);
             break;
 
