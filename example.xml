@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE example PUBLIC "" "example.dtd">
+<data>
+ <user>
+  <name>Gaurav</name>
+  <emailid>g.sharma@gmail.com </emailid>
+  <dob>1994-08-09</dob>
+  <mob>9003755127</mob>
+  <pass>gops0024</pass>
+ </user>
+ <user>
+  <name>Shubham</name>
+  <emailid>s.pamecha@gmail.com </emailid>
+  <dob>1995-09-22</dob>
+  <mob>1234567890</mob>
+  <pass>126621</pass>
+ </user>
+<data>
+
+
