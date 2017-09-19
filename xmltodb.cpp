@@ -9,7 +9,7 @@
 #include<typeinfo>
 #include<sstream>
 #include<locale>
-
+#include<fstream>
 using namespace std;
 class DB
 {
@@ -34,7 +34,7 @@ class DB
     	else
         	cout << "connection object problem" <<mysql_error(conn)<< endl;
 
-         this->conn=mysql_real_connect(conn,"localhost","root","m!lkshake94","db1",0,NULL,0);
+         this->conn=mysql_real_connect(conn,"localhost","abhi94","","db1",0,NULL,0);
 
 
          return this->conn;
@@ -49,7 +49,7 @@ class DB
             cin>>this->tablename;
 
             string query;
-            query="create table IF NOT EXISTS "+tablename+"(userid int(6) NOT NULL AUTO_INCREMENT primary key,username varchar(30) NOT NULL,emailid varchar(50) NOT NULL,dob DATE NOT NULL,mob bigint(10) NOT NULL,pass varchar(20) NOT NULL)";
+            query="create table IF NOT EXISTS "+tablename+"(userid int(6) NOT NULL AUTO_INCREMENT primary key,username varchar(30) NOT NULL,emailid varchar(50) NOT NULL,dob DATE NOT NULL,mob bigint(10) NOT NULL,pass varchar(20) NOT NULL,image blob)";
 
             const char* q=query.c_str();
 
@@ -87,6 +87,8 @@ void display()
                      cout<<"DATE OF BIRTH:"<<row[3]<<endl;
                      cout<<"Mobile Number: "<<row[4]<<endl;
                      cout<<"Password: "<<row[5]<<endl;
+                     cout<<"image:"<<row[6]<<endl;
+		    
                      cout<<'\n';
 
                  }
@@ -98,13 +100,22 @@ void display()
 
 }
 
-void inserting(string name,string email_id,string date,string mob,string pwd)
+void inserting(string name,string email_id,string date,string mob,string pwd,string img)
 {
 
+const char* i=img.c_str();
+streampos size;
+char* memblock;
+ifstream file(i,ios::in|ios::binary|ios::ate);
+size=file.tellg();
+memblock=new char[size];
+file.seekg(0,ios::beg);
+file.read(memblock,size);
+file.close();
 
 
             //inserting the data
-            string query="insert into "+tablename+"(username,emailid,dob,mob,pass) values('"+name+"','"+email_id+"','"+date+"','"+mob+"','"+pwd+"')";
+            string query="insert into "+tablename+"(username,emailid,dob,mob,pass,image) values('"+name+"','"+email_id+"','"+date+"','"+mob+"','"+pwd+"','"+string(memblock)+"')";
             const char* q=query.c_str();
 
             qstate=mysql_query(conn,q);
@@ -133,61 +144,61 @@ void update(string id)
 		{
 		case 1:
 		cout<<"enter the new name"<<endl;cin>>name;
-query="update "+tablename+" set username='"+name+"' where userid='"+id+"'";
-q=query.c_str();
-qstate=mysql_query(conn,q);
-if(!qstate)
-cout<<"Updation done successfully"<<endl;
-else
-cout<<"query execution problem"<<mysql_error(conn)<<endl;
-break;
+		query="update "+tablename+" set username='"+name+"' where userid='"+id+"'";
+		q=query.c_str();
+		qstate=mysql_query(conn,q);
+		if(!qstate)
+			cout<<"Updation done successfully"<<endl;
+		else
+			cout<<"query execution problem"<<mysql_error(conn)<<endl;
+		break;
 
-case 2:
-cout<<"enter the new emaild_id"<<endl;cin>>email_id;
+		case 2:
+		cout<<"enter the new emaild_id"<<endl;cin>>email_id;
 query="update "+tablename+" set emailid='"+email_id+"' where userid='"+id+"'";
-q=query.c_str();
-qstate=mysql_query(conn,q);
-if(!qstate)
-cout<<"Updation done successfully"<<endl;
-else
-cout<<"query execution problem"<<mysql_error(conn)<<endl;
-break;
+		q=query.c_str();
+		qstate=mysql_query(conn,q);
+		if(!qstate)
+			cout<<"Updation done successfully"<<endl;
+		else
+			cout<<"query execution problem"<<mysql_error(conn)<<endl;
+		break;
 
-case 3:
-cout<<"enter the new date of birth(YYYY-MM-DD)"<<endl;cin>>dob;
-query="update "+tablename+" set dob='"+dob+"' where userid='"+id+"'";
-q=query.c_str();
-qstate=mysql_query(conn,q);
-if(!qstate)
-cout<<"Updation done successfully"<<endl;
-else
-cout<<"query execution problem"<<mysql_error(conn)<<endl;
-break;
+		case 3:
+		cout<<"enter the new date of birth(YYYY-MM-DD)"<<endl;cin>>dob;
+		query="update "+tablename+" set dob='"+dob+"' where userid='"+id+"'";
+		q=query.c_str();
+		qstate=mysql_query(conn,q);
+		if(!qstate)
+		cout<<"Updation done successfully"<<endl;
+		else
+		cout<<"query execution problem"<<mysql_error(conn)<<endl;
+		break;
 
-case 4:
-cout<<"enter the new mobile number"<<endl;cin>>mob;
-query="update "+tablename+" set mob='"+mob+"' where userid='"+id+"'";
-q=query.c_str();
-qstate=mysql_query(conn,q);
-if(!qstate)
-cout<<"Updation done successfully"<<endl;
-else
-cout<<"query execution problem"<<mysql_error(conn)<<endl;
-break;
+		case 4:	
+		cout<<"enter the new mobile number"<<endl;cin>>mob;
+		query="update "+tablename+" set mob='"+mob+"' where userid='"+id+"'";
+		q=query.c_str();
+		qstate=mysql_query(conn,q);
+		if(!qstate)
+			cout<<"Updation done successfully"<<endl;
+		else
+			cout<<"query execution problem"<<mysql_error(conn)<<endl;
+		break;
 
-case 5:
-cout<<"enter the new password"<<endl;cin>>pass;
-query="update "+tablename+" set pass='"+pass+"' where userid='"+id+"'";
-q=query.c_str();
-qstate=mysql_query(conn,q);
-if(!qstate)
-cout<<"Updation done successfully"<<endl;
-else
-cout<<"query execution problem"<<mysql_error(conn)<<endl;
-break;
+		case 5:
+		cout<<"enter the new password"<<endl;cin>>pass;
+		query="update "+tablename+" set pass='"+pass+"' where userid='"+id+"'";
+		q=query.c_str();
+		qstate=mysql_query(conn,q);
+		if(!qstate)
+			cout<<"Updation done successfully"<<endl;
+		else
+			cout<<"query execution problem"<<mysql_error(conn)<<endl;
+		break;
 
-default:
-cout<<"invalid option"<<endl;
+		default:
+		cout<<"invalid option"<<endl;
 
 }
 
@@ -221,6 +232,8 @@ void deleting()
 void insertfromxml()
 {
 string name,email_id,dob,mob,pass;
+string img="";
+
     xmlpp::TextReader reader("example.xml");
 int d=0;int count=0;int count1=0;
 string n=" ";
@@ -237,15 +250,14 @@ break;
 
 
 
- 	cout<<d<<" "<<n<<" "<<reader.get_depth()<<" "<<reader.get_name()<<" "<<reader.get_value()<<" "<<count<<endl;
-
+ 	
        if(reader.get_name()=="user")
         { d=reader.get_depth();
 	++count;
          if(count==2)
 {count=0;
-cout<<name<<email_id<<dob<<mob<<pass<<endl;
-inserting(name,email_id,dob,mob,pass);
+
+inserting(name,email_id,dob,mob,pass,img);
          }
          continue;
         } 
@@ -358,6 +370,8 @@ bool validate_date(string date)
 
     if(x<=0 || x>31)
         return false;
+
+return true;
 }
 
 
@@ -403,7 +417,7 @@ bool validate_pass(string name)
 int main()
 {
     DB db;
-string userid,pwd,email_id,name,mob,date;
+string userid,pwd,email_id,name,mob,date,img;
 
 
 
@@ -434,8 +448,8 @@ string userid,pwd,email_id,name,mob,date;
             case 2:
              cout<<"insert data"<<endl;
             start:
-            cout<<"Enter the Username , Email_id , date of birth , Mobile Number , Password in the mentioned sequence"<<endl;
-           cin>>name>>email_id>>date>>mob>>pwd;   
+            cout<<"Enter the Username , Email_id , date of birth , Mobile Number , Password,image_file_name in the mentioned sequence"<<endl;
+           cin>>name>>email_id>>date>>mob>>pwd>>img;   
             if(!validate_name(name))
             {
                 cout<<"enter a correct user name"<<endl;
@@ -463,7 +477,7 @@ string userid,pwd,email_id,name,mob,date;
             }
  
            
-            db.inserting(name,email_id,date,mob,pwd);
+            db.inserting(name,email_id,date,mob,pwd,img);
             break;
 
             	case 3:
